@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "inventory_updates",
+  "type": "object",
+  "required": ["event_id", "event_timestamp", "event_type", "product_id", "warehouse_id"],
+  "properties": {
+    "event_type": {"enum": ["stock_added", "stock_reserved", "stock_released", "stockout_warning", "inventory_adjusted"]},
+    "product_id": {"type": "string"},
+    "warehouse_id": {"type": "string"},
+    "quantity": {"type": "integer"},
+    "inventory_status": {"enum": ["IN_STOCK", "LOW_STOCK", "OUT_OF_STOCK", "RESERVED"]}
+  }
+}

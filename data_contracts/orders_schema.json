@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "orders",
+  "type": "object",
+  "required": ["event_id", "event_timestamp", "event_type", "order_id", "product_id", "quantity", "price"],
+  "properties": {
+    "event_type": {"enum": ["order_created", "order_confirmed", "order_cancelled", "order_returned"]},
+    "order_id": {"type": "string"},
+    "customer_id": {"type": ["string", "null"]},
+    "product_id": {"type": ["string", "null"]},
+    "quantity": {"type": "integer", "minimum": 1},
+    "price": {"type": "number", "minimum": 0},
+    "amount": {"type": "number", "minimum": 0}
+  }
+}

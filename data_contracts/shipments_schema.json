@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "shipment_events",
+  "type": "object",
+  "required": ["event_id", "event_timestamp", "event_type", "order_id"],
+  "properties": {
+    "event_type": {"enum": ["shipment_created", "shipped", "delayed", "delivered", "returned"]},
+    "order_id": {"type": "string"},
+    "location": {"type": "string"}
+  }
+}

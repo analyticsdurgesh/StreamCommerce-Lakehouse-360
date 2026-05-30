@@ -1,0 +1,16 @@
+environment: prod
+storage:
+  provider: s3
+  bucket: streamcommerce-lakehouse
+  region: us-east-1
+paths:
+  landing: s3://streamcommerce-lakehouse/landing
+  bronze: s3://streamcommerce-lakehouse/bronze
+  silver: s3://streamcommerce-lakehouse/silver
+  gold: s3://streamcommerce-lakehouse/gold
+  quarantine: s3://streamcommerce-lakehouse/quarantine
+kafka:
+  bootstrap_servers: ${KAFKA_BOOTSTRAP_SERVERS}
+quality:
+  critical_pass_threshold: 0.98
+  freshness_hours: 4

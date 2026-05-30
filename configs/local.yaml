@@ -1,0 +1,24 @@
+environment: local
+storage:
+  provider: minio
+  bucket: streamcommerce-lakehouse
+  endpoint_url: http://localhost:9000
+  local_root: data
+paths:
+  landing: data/landing
+  bronze: data/bronze
+  silver: data/silver
+  gold: data/gold
+  quarantine: data/quarantine
+kafka:
+  bootstrap_servers: localhost:9092
+  topics:
+    customer_events: customer_events
+    orders: orders
+    payments: payments
+    inventory_updates: inventory_updates
+    product_catalog_updates: product_catalog_updates
+    shipment_events: shipment_events
+quality:
+  critical_pass_threshold: 0.95
+  freshness_hours: 24

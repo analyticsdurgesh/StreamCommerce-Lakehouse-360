@@ -1,0 +1,29 @@
+{
+  "name": "streamcommerce-lakehouse-360",
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "bronze_ingestion",
+      "notebook_task": {"notebook_path": "/Repos/streamcommerce/databricks/notebooks/01_bronze_ingestion.py"},
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}"
+    },
+    {
+      "task_key": "silver_cleaning",
+      "depends_on": [{"task_key": "bronze_ingestion"}],
+      "notebook_task": {"notebook_path": "/Repos/streamcommerce/databricks/notebooks/02_silver_cleaning.py"},
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}"
+    },
+    {
+      "task_key": "gold_aggregations",
+      "depends_on": [{"task_key": "silver_cleaning"}],
+      "notebook_task": {"notebook_path": "/Repos/streamcommerce/databricks/notebooks/03_gold_aggregations.py"},
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}"
+    },
+    {
+      "task_key": "data_quality_checks",
+      "depends_on": [{"task_key": "gold_aggregations"}],
+      "notebook_task": {"notebook_path": "/Repos/streamcommerce/databricks/notebooks/04_data_quality_checks.py"},
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}"
+    }
+  ]
+}

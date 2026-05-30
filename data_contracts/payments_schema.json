@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "payments",
+  "type": "object",
+  "required": ["event_id", "event_timestamp", "payment_id", "order_id", "payment_status"],
+  "properties": {
+    "event_type": {"enum": ["payment_success", "payment_failed", "payment_pending", "refund_success", "refund_failed"]},
+    "payment_id": {"type": "string"},
+    "order_id": {"type": "string"},
+    "payment_status": {"enum": ["SUCCESS", "FAILED", "PENDING", "REFUNDED"]},
+    "amount": {"type": "number", "minimum": 0}
+  }
+}

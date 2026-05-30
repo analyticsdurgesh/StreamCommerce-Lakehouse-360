@@ -1,0 +1,9 @@
+{
+  "environment": "prod",
+  "bucket": "streamcommerce-lakehouse",
+  "processing_date": "{{ ds }}",
+  "bronze_path": "s3://streamcommerce-lakehouse/bronze",
+  "silver_path": "s3://streamcommerce-lakehouse/silver",
+  "gold_path": "s3://streamcommerce-lakehouse/gold",
+  "quarantine_path": "s3://streamcommerce-lakehouse/quarantine"
+}

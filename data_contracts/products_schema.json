@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "product_catalog_updates",
+  "type": "object",
+  "required": ["event_id", "event_timestamp", "event_type", "product_id", "category", "price"],
+  "properties": {
+    "event_type": {"enum": ["product_created", "product_updated", "price_changed", "category_changed", "product_deactivated"]},
+    "product_id": {"type": "string"},
+    "category": {"type": "string"},
+    "price": {"type": "number", "minimum": 0},
+    "seller_id": {"type": "string"}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "customer_events",
+  "type": "object",
+  "required": ["event_id", "event_timestamp", "event_type", "session_id"],
+  "properties": {
+    "event_id": {"type": "string"},
+    "event_timestamp": {"type": ["string", "null"], "format": "date-time"},
+    "event_type": {"enum": ["page_view", "product_view", "add_to_cart", "remove_from_cart", "checkout_started", "search", "logout"]},
+    "customer_id": {"type": ["string", "null"]},
+    "session_id": {"type": "string"},
+    "product_id": {"type": ["string", "null"]},
+    "device_type": {"type": "string"},
+    "location": {"type": "string"},
+    "campaign_id": {"type": "string"}
+  }
+}
