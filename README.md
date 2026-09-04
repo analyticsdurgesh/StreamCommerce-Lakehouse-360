@@ -1,5 +1,17 @@
 # StreamCommerce Lakehouse 360
 
+<!-- de-book-banner -->
+> ### Free book: *Data Engineering: From Zero to Production & Interview Ready*
+>
+> 244 pages, by the author of this repo. One order followed through a fictional
+> Indian e-commerce company, with each tool arriving at the moment the story needs
+> it. Every figure in it was measured rather than asserted, and the code behind
+> each one is in the [Field Kit](https://github.com/analyticsdurgesh/data-engineering-book-field-kit).
+>
+> **[Read it free, no card &rarr;](https://www.prepnplaced.com/data-engineering-book?utm_source=github&utm_medium=repo&utm_campaign=de_book)**
+<!-- /de-book-banner -->
+
+
 Production-style e-commerce lakehouse platform that simulates real-time operational events, lands them in object storage, promotes data through Bronze, Silver, and Gold layers, applies reusable data quality checks, quarantines bad records, orchestrates the lifecycle with Airflow, and serves executive analytics through a Plotly Dash dashboard.
 
 This is a public portfolio project designed to demonstrate how a modern Data Engineering platform is designed end to end: ingestion, lake storage, medallion modeling, orchestration, quality, observability, infrastructure, dashboarding, and production migration thinking.
