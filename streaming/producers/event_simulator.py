@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 from uuid import uuid4
 
-from kafka.topics import TOPICS
+from streaming.topics import TOPICS
 
 try:
     from faker import Faker

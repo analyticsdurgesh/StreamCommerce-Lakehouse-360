@@ -1,0 +1,5 @@
+# Run the Databricks notebooks on your laptop: python scripts/run_notebooks_locally.py
+# Needs Java 17. delta-spark 3.2.x is the release built for Spark 3.5, so keep the pair together.
+-r requirements.txt
+pyspark==3.5.3
+delta-spark==3.2.1

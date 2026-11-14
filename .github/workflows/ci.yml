@@ -1,0 +1,93 @@
+name: StreamCommerce CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    # A fresh clone, the README's install, the tests, and the local medallion pipeline.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Compile and test
+        run: bash scripts/validate_project.sh
+
+  kafka-stack:
+    # The README's Kafka path end to end: boot Kafka, topics, produce, land, bronze/silver/gold.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Start Kafka
+        run: |
+          cp .env.example .env
+          docker compose up -d --wait kafka
+      - name: Seed reference data and create the topics
+        run: |
+          python scripts/seed_reference_data.py
+          docker compose exec -T kafka bash /opt/streamcommerce/scripts/init_kafka_topics.sh
+      - name: Produce orders and payments for 10 seconds each
+        run: |
+          python -m streaming.producers.event_simulator --source orders --event-rate 10 --duration 10 --bad-data-percentage 10
+          python -m streaming.producers.event_simulator --source payments --event-rate 10 --duration 10 --bad-data-percentage 10
+      - name: Land the events (stop after 15 quiet seconds)
+        run: python -m streaming.consumers.s3_landing_consumer --landing-root data/landing --idle-timeout-seconds 15
+      - name: Bronze, silver, gold
+        run: make run-pipeline
+      - name: Silver has no event without an event_id, and gold was built
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import pandas as pd
+          from databricks.src.utils.io import read_table
+          for topic in ("orders", "payments"):
+              silver = read_table(Path("data/silver") / topic)
+              print(f"silver {topic}: {len(silver)} rows")
+              assert len(silver) > 0, f"silver {topic} is empty"
+              assert silver["event_id"].notna().all(), f"silver {topic} has rows without event_id"
+              assert not silver["event_id"].duplicated().any(), f"silver {topic} has duplicate event_ids"
+          gold = [p.name for p in Path("data/gold").iterdir() if p.is_dir()]
+          print("gold tables:", sorted(gold))
+          assert gold, "no gold tables were written"
+          PY
+      - name: Kafka logs on failure
+        if: failure()
+        run: docker compose logs kafka | tail -150
+
+  spark-notebooks:
+    # The Databricks notebooks, unchanged, on local Spark + Delta (see scripts/run_notebooks_locally.py).
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-spark.txt
+      - name: Run notebooks 01 to 04 and check every layer
+        run: python scripts/run_notebooks_locally.py

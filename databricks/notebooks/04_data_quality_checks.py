@@ -12,12 +12,15 @@ results = []
 for table in tables:
     df = spark.read.format("delta").load(f"{silver_path}/{table}")
     total = df.count()
-    for name, condition in {
-        "event_id_not_null": "event_id is not null",
-        "event_timestamp_not_null": "event_timestamp is not null",
-        "event_id_unique": "event_id is not null",
-    }.items():
-        failed = total - df.filter(condition).count()
+    with_id = df.filter("event_id is not null")
+    failures = {
+        "event_id_not_null": total - with_id.count(),
+        "event_timestamp_not_null": df.filter("event_timestamp is null").count(),
+        # Rows that repeat an event_id. (This check used to be a copy of the
+        # not-null check, so duplicates were never counted.)
+        "event_id_unique": with_id.count() - with_id.select("event_id").distinct().count(),
+    }
+    for name, failed in failures.items():
         results.append((table, name, failed == 0, failed, total, 1.0 if total == 0 else (total - failed) / total))
 
 scorecard = spark.createDataFrame(results, "table_name string, check_name string, passed boolean, failed_record_count long, total_record_count long, pass_percentage double")

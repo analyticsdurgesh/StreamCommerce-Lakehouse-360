@@ -1,4 +1,4 @@
-from kafka.producers.event_simulator import generate_event
+from streaming.producers.event_simulator import generate_event
 
 
 def test_generate_order_event_has_required_shape():

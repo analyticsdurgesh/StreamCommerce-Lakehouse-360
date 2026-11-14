@@ -262,7 +262,7 @@ quarantine/{invalid_records,schema_violations,dq_failures}
 │   └── src/                      # Bronze/Silver/Gold/DQ pipeline modules
 ├── docs/                         # Architecture, runbooks, interview guide
 ├── infra/terraform/              # AWS S3 infrastructure templates
-├── kafka/
+├── streaming/                    # Kafka code (not named kafka/: that name belongs to the kafka-python library)
 │   ├── producers/                # Event simulators
 │   └── consumers/                # Landing consumer
 ├── scripts/                      # Local setup and validation commands
@@ -279,6 +279,12 @@ cp .env.example .env
 make up
 make init
 ```
+
+`requirements.txt` is what runs on your laptop (pipeline, producers, consumer,
+dashboard, tests). Airflow is not in it on purpose: it runs in Docker with its
+own image when you `make up`. To run the Databricks notebooks on your laptop
+(needs Java 17): `pip install -r requirements-spark.txt`, then
+`python scripts/run_notebooks_locally.py`.
 
 Open:
 
@@ -299,14 +305,14 @@ python scripts/seed_reference_data.py
 Produce events:
 
 ```bash
-python -m kafka.producers.event_simulator --source customer_events --event-rate 5 --duration 60 --bad-data-percentage 8
-python -m kafka.producers.event_simulator --source orders --event-rate 3 --duration 60 --bad-data-percentage 10
+python -m streaming.producers.event_simulator --source customer_events --event-rate 5 --duration 60 --bad-data-percentage 8
+python -m streaming.producers.event_simulator --source orders --event-rate 3 --duration 60 --bad-data-percentage 10
 ```
 
 Consume Kafka into landing files:
 
 ```bash
-python -m kafka.consumers.s3_landing_consumer --landing-root data/landing
+python -m streaming.consumers.s3_landing_consumer --landing-root data/landing
 ```
 
 Run the local medallion pipeline:

@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pandas as pd
 
-from kafka.topics import TOPIC_NAMES
+from streaming.topics import TOPIC_NAMES
 
 from databricks.src.utils.io import ensure_dir, read_jsonl, utc_now_iso, write_table
 
