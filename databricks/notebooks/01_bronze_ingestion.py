@@ -19,8 +19,8 @@ for topic in topics:
         .withColumn("raw_json", F.to_json(F.struct("*")))
         .withColumn("ingestion_timestamp", F.current_timestamp())
         .withColumn("source_topic", F.lit(topic))
-        # _metadata.file_path, not input_file_name(): Unity Catalog and serverless
-        # compute (Databricks Free Edition) refuse input_file_name().
+        # _metadata.file_path, not the input_file_name function: Unity Catalog and
+        # serverless compute (Databricks Free Edition) refuse that function.
         .withColumn("source_file", F.col("_metadata.file_path"))
         .withColumn("batch_id", F.expr("uuid()"))
         # An empty widget means "today". F.lit("") is not NULL, so coalesce() alone

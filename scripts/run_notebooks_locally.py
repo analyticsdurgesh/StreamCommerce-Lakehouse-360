@@ -78,7 +78,8 @@ def write_landing(landing: Path, per_topic: int = 80) -> dict[str, str]:
 def main() -> int:
     for name in NOTEBOOKS:
         source = (ROOT / "databricks" / "notebooks" / name).read_text()
-        bad = [token for token in SERVERLESS_UNSAFE if token in source]
+        code = "\n".join(line for line in source.splitlines() if not line.lstrip().startswith("#"))
+        bad = [token for token in SERVERLESS_UNSAFE if token in code]
         assert not bad, f"{name} uses {bad}, which serverless compute does not support"
 
     work = Path(tempfile.mkdtemp(prefix="streamcommerce-notebooks-"))
