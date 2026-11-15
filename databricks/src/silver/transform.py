@@ -51,7 +51,12 @@ def normalize(df: pd.DataFrame) -> pd.DataFrame:
         normalized["payment_status"] = normalized["payment_status"].fillna(normalized.get("event_type").map(status_map))
         normalized["payment_status"] = normalized["payment_status"].astype("string").str.upper()
     if "event_id" in normalized and "event_timestamp" in normalized:
-        normalized = normalized.sort_values("event_timestamp").drop_duplicates("event_id", keep="last")
+        # Deduplicate real ids only. drop_duplicates treats every missing id as the
+        # same value, so it used to merge all id-less rows into one and hide how
+        # many bad records had arrived. Those rows go on to the quality checks.
+        has_id = normalized["event_id"].notna()
+        deduped = normalized[has_id].sort_values("event_timestamp").drop_duplicates("event_id", keep="last")
+        normalized = pd.concat([deduped, normalized[~has_id]])
     normalized["dq_is_valid"] = True
     return normalized
 
@@ -66,8 +71,9 @@ def transform_topic(bronze_root: str, silver_root: str, quarantine_root: str, to
     runner = ecommerce_checks(topic, parsed)
     scorecard = runner.scorecard()
     quarantine = runner.quarantine()
-    invalid_ids = set(quarantine["event_id"].dropna()) if "event_id" in quarantine else set()
-    valid = parsed[~parsed["event_id"].isin(invalid_ids)].copy() if "event_id" in parsed else parsed
+    # Remove failed rows by ROW, not by event_id: a null event_id matches no id,
+    # so an id-based filter let id-less and malformed records into silver.
+    valid = parsed.drop(index=runner.failed_index()).copy()
     write_table(valid, Path(silver_root) / topic)
     if not quarantine.empty:
         write_table(quarantine, Path(quarantine_root) / "dq_failures" / topic)

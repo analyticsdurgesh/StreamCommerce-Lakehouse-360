@@ -51,7 +51,7 @@ The project solves this problem by creating a lakehouse pipeline that turns mess
 The primary data source is a custom-built synthetic event simulator:
 
 ```text
-kafka/producers/event_simulator.py
+streaming/producers/event_simulator.py
 ```
 
 This simulator represents production source systems used by an e-commerce company.
@@ -150,7 +150,7 @@ Python producers generate synthetic e-commerce events.
 Example:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source orders \
   --event-rate 3 \
   --duration 120 \
@@ -179,7 +179,7 @@ Kafka allows the data platform to decouple source systems from downstream proces
 The landing consumer reads from Kafka and writes JSONL files to landing storage:
 
 ```text
-kafka/consumers/s3_landing_consumer.py
+streaming/consumers/s3_landing_consumer.py
 ```
 
 Local output example:

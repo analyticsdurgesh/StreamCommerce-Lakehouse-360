@@ -19,8 +19,12 @@ for topic in topics:
         .withColumn("raw_json", F.to_json(F.struct("*")))
         .withColumn("ingestion_timestamp", F.current_timestamp())
         .withColumn("source_topic", F.lit(topic))
-        .withColumn("source_file", F.input_file_name())
+        # _metadata.file_path, not the input_file_name function: Unity Catalog and
+        # serverless compute (Databricks Free Edition) refuse that function.
+        .withColumn("source_file", F.col("_metadata.file_path"))
         .withColumn("batch_id", F.expr("uuid()"))
-        .withColumn("processing_date", F.coalesce(F.lit(processing_date), F.current_date().cast("string")))
+        # An empty widget means "today". F.lit("") is not NULL, so coalesce() alone
+        # used to write every run into an empty-string partition.
+        .withColumn("processing_date", F.coalesce(F.lit(processing_date or None).cast("string"), F.current_date().cast("string")))
     )
     df.write.format("delta").mode("append").partitionBy("processing_date").save(target)

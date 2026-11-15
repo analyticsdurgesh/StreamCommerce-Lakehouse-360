@@ -27,7 +27,7 @@ The data source is **not a static downloaded CSV by default**. The primary sourc
 The simulator is located here:
 
 ```text
-kafka/producers/event_simulator.py
+streaming/producers/event_simulator.py
 ```
 
 It represents six production-like e-commerce source systems:
@@ -110,8 +110,8 @@ Important folders:
 ```text
 configs/              local and cloud configuration
 data_contracts/       JSON schemas for source events
-kafka/producers/      synthetic Kafka producers
-kafka/consumers/      Kafka-to-landing consumer
+streaming/producers/      synthetic Kafka producers
+streaming/consumers/      Kafka-to-landing consumer
 airflow/dags/         orchestration DAGs
 databricks/notebooks/ Databricks-ready notebooks
 databricks/src/       reusable Bronze, Silver, Gold, DQ code
@@ -207,7 +207,7 @@ Open one terminal per producer, or run one source at a time.
 Customer clickstream:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source customer_events \
   --event-rate 5 \
   --duration 120 \
@@ -217,7 +217,7 @@ python -m kafka.producers.event_simulator \
 Orders:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source orders \
   --event-rate 3 \
   --duration 120 \
@@ -227,7 +227,7 @@ python -m kafka.producers.event_simulator \
 Payments:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source payments \
   --event-rate 3 \
   --duration 120 \
@@ -237,7 +237,7 @@ python -m kafka.producers.event_simulator \
 Inventory:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source inventory_updates \
   --event-rate 2 \
   --duration 120 \
@@ -247,7 +247,7 @@ python -m kafka.producers.event_simulator \
 Product catalog:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source product_catalog_updates \
   --event-rate 1 \
   --duration 120 \
@@ -257,7 +257,7 @@ python -m kafka.producers.event_simulator \
 Shipments:
 
 ```bash
-python -m kafka.producers.event_simulator \
+python -m streaming.producers.event_simulator \
   --source shipment_events \
   --event-rate 2 \
   --duration 120 \
@@ -278,7 +278,7 @@ Important producer arguments:
 In another terminal, run the landing consumer:
 
 ```bash
-python -m kafka.consumers.s3_landing_consumer --landing-root data/landing
+python -m streaming.consumers.s3_landing_consumer --landing-root data/landing
 ```
 
 This writes Kafka messages as JSONL files under:
@@ -684,7 +684,7 @@ data/gold/data_quality_scorecard/
 
 Recommended demo sequence:
 
-1. Show `kafka/producers/event_simulator.py` and explain the source systems.
+1. Show `streaming/producers/event_simulator.py` and explain the source systems.
 2. Run a producer with a non-zero bad data percentage.
 3. Show landing JSONL files under `data/landing`.
 4. Run `python -m databricks.src.local_pipeline`.

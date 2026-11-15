@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -m compileall kafka databricks dashboard scripts
+python -m compileall streaming databricks dashboard scripts
 pytest -q

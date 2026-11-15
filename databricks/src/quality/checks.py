@@ -81,6 +81,19 @@ class DataQualityRunner:
     def quarantine(self) -> pd.DataFrame:
         return pd.concat(self.failed_records, ignore_index=True) if self.failed_records else pd.DataFrame()
 
+    def failed_index(self) -> pd.Index:
+        """Row labels (of the DataFrame the runner checked) that failed at least one check.
+
+        Use this to split valid rows from bad ones. Splitting by event_id instead
+        lets through exactly the rows that most need stopping: a row whose
+        event_id is null, or a malformed record that has no event_id at all,
+        matches no id and so is never removed.
+        """
+        labels: set = set()
+        for failed in self.failed_records:
+            labels.update(failed.index)
+        return pd.Index(list(labels))
+
 
 def ecommerce_checks(table_name: str, df: pd.DataFrame) -> DataQualityRunner:
     valid_payment_statuses = {"SUCCESS", "FAILED", "PENDING", "REFUNDED"}
